@@ -1,0 +1,1 @@
+export const CALENDAR_TABLE_COLUMN_WIDTH = '14.28%';

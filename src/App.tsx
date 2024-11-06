@@ -31,7 +31,6 @@ import {
   Tbody,
   Td,
   Text,
-  Th,
   Thead,
   Tooltip,
   Tr,
@@ -40,6 +39,9 @@ import {
 } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 
+import { ScheduleDay } from './components/ScheduleDay.tsx';
+import { WeekDaysTableColumnHeader } from './components/WeekDaysTableColumnHeader.tsx';
+import { CALENDAR_TABLE_COLUMN_WIDTH } from './constants.ts';
 import { useCalendarView } from './hooks/useCalendarView.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
@@ -58,8 +60,6 @@ import { findOverlappingEvents } from './utils/eventOverlap';
 import { getTimeErrorMessage } from './utils/timeValidation';
 
 const categories = ['업무', '개인', '가족', '기타'];
-
-const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
 const notificationOptions = [
   { value: 1, label: '1분 전' },
@@ -165,48 +165,31 @@ function App() {
     }
   };
 
-  const renderWeekView = () => {
+  const renderWeekView = (currentDate: Date, filteredEvents: Event[], notifiedEvents: string[]) => {
     const weekDates = getWeekDates(currentDate);
     return (
       <VStack data-testid="week-view" align="stretch" w="full" spacing={4}>
         <Heading size="md">{formatWeek(currentDate)}</Heading>
         <Table variant="simple" w="full">
           <Thead>
-            <Tr>
-              {weekDays.map((day) => (
-                <Th key={day} width="14.28%">
-                  {day}
-                </Th>
-              ))}
-            </Tr>
+            <WeekDaysTableColumnHeader />
           </Thead>
           <Tbody>
             <Tr>
               {weekDates.map((date) => (
-                <Td key={date.toISOString()} height="100px" verticalAlign="top" width="14.28%">
+                <Td
+                  key={date.toISOString()}
+                  height="100px"
+                  verticalAlign="top"
+                  width={CALENDAR_TABLE_COLUMN_WIDTH}
+                >
                   <Text fontWeight="bold">{date.getDate()}</Text>
                   {filteredEvents
                     .filter((event) => new Date(event.date).toDateString() === date.toDateString())
                     .map((event) => {
                       const isNotified = notifiedEvents.includes(event.id);
-                      return (
-                        <Box
-                          key={event.id}
-                          p={1}
-                          my={1}
-                          bg={isNotified ? 'red.100' : 'gray.100'}
-                          borderRadius="md"
-                          fontWeight={isNotified ? 'bold' : 'normal'}
-                          color={isNotified ? 'red.500' : 'inherit'}
-                        >
-                          <HStack spacing={1}>
-                            {isNotified && <BellIcon />}
-                            <Text fontSize="sm" noOfLines={1}>
-                              {event.title}
-                            </Text>
-                          </HStack>
-                        </Box>
-                      );
+
+                      return <ScheduleDay key={event.id} event={event} isNotified={isNotified} />;
                     })}
                 </Td>
               ))}
@@ -217,7 +200,12 @@ function App() {
     );
   };
 
-  const renderMonthView = () => {
+  const renderMonthView = (
+    currentDate: Date,
+    holidays: { [key: string]: string },
+    filteredEvents: Event[],
+    notifiedEvents: string[]
+  ) => {
     const weeks = getWeeksAtMonth(currentDate);
 
     return (
@@ -225,13 +213,7 @@ function App() {
         <Heading size="md">{formatMonth(currentDate)}</Heading>
         <Table variant="simple" w="full">
           <Thead>
-            <Tr>
-              {weekDays.map((day) => (
-                <Th key={day} width="14.28%">
-                  {day}
-                </Th>
-              ))}
-            </Tr>
+            <WeekDaysTableColumnHeader />
           </Thead>
           <Tbody>
             {weeks.map((week, weekIndex) => (
@@ -245,7 +227,7 @@ function App() {
                       key={dayIndex}
                       height="100px"
                       verticalAlign="top"
-                      width="14.28%"
+                      width={CALENDAR_TABLE_COLUMN_WIDTH}
                       position="relative"
                     >
                       {day && (
@@ -258,23 +240,9 @@ function App() {
                           )}
                           {getEventsForDay(filteredEvents, day).map((event) => {
                             const isNotified = notifiedEvents.includes(event.id);
+
                             return (
-                              <Box
-                                key={event.id}
-                                p={1}
-                                my={1}
-                                bg={isNotified ? 'red.100' : 'gray.100'}
-                                borderRadius="md"
-                                fontWeight={isNotified ? 'bold' : 'normal'}
-                                color={isNotified ? 'red.500' : 'inherit'}
-                              >
-                                <HStack spacing={1}>
-                                  {isNotified && <BellIcon />}
-                                  <Text fontSize="sm" noOfLines={1}>
-                                    {event.title}
-                                  </Text>
-                                </HStack>
-                              </Box>
+                              <ScheduleDay key={event.id} event={event} isNotified={isNotified} />
                             );
                           })}
                         </>
@@ -441,8 +409,9 @@ function App() {
             />
           </HStack>
 
-          {view === 'week' && renderWeekView()}
-          {view === 'month' && renderMonthView()}
+          {view === 'week' && renderWeekView(currentDate, filteredEvents, notifiedEvents)}
+          {view === 'month' &&
+            renderMonthView(currentDate, holidays, filteredEvents, notifiedEvents)}
         </VStack>
 
         <VStack data-testid="event-list" w="500px" h="full" overflowY="auto">
