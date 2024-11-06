@@ -1,0 +1,46 @@
+import { FormControl, FormLabel, Input, VStack, Text } from '@chakra-ui/react';
+
+import { useCalendarView } from '../hooks/useCalendarView';
+import { useNotifications } from '../hooks/useNotifications';
+import { useSearch } from '../hooks/useSearch';
+import { Event } from '../types';
+import { ScheduleSearched } from './ScheduleSearched';
+
+type CalendarSearchProps = {
+  events: Event[];
+  editEvent: (event: Event) => void;
+  deleteEvent: (id: string) => void;
+};
+
+export const CalendarSearch = ({ events, editEvent, deleteEvent }: CalendarSearchProps) => {
+  const { notifiedEvents } = useNotifications(events);
+  const { view, currentDate } = useCalendarView();
+  const { searchTerm, filteredEvents, setSearchTerm } = useSearch(events, currentDate, view);
+
+  return (
+    <VStack data-testid="event-list" w="500px" h="full" overflowY="auto">
+      <FormControl>
+        <FormLabel>일정 검색</FormLabel>
+        <Input
+          placeholder="검색어를 입력하세요"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </FormControl>
+
+      {filteredEvents.length === 0 ? (
+        <Text>검색 결과가 없습니다.</Text>
+      ) : (
+        filteredEvents.map((event) => (
+          <ScheduleSearched
+            key={event.id}
+            event={event}
+            isNotified={notifiedEvents.includes(event.id)}
+            editEvent={editEvent}
+            deleteEvent={deleteEvent}
+          />
+        ))
+      )}
+    </VStack>
+  );
+};
