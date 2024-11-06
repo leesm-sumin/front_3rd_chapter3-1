@@ -1,10 +1,4 @@
-import {
-  BellIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DeleteIcon,
-  EditIcon,
-} from '@chakra-ui/icons';
+import { BellIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
   Alert,
   AlertDialog,
@@ -27,35 +21,20 @@ import {
   IconButton,
   Input,
   Select,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Thead,
   Tooltip,
-  Tr,
   useToast,
   VStack,
 } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 
-import { ScheduleDay } from './components/ScheduleDay.tsx';
-import { WeekDaysTableColumnHeader } from './components/WeekDaysTableColumnHeader.tsx';
-import { CALENDAR_TABLE_COLUMN_WIDTH } from './constants.ts';
+import { CalendarView } from './components/CalendarView.tsx';
 import { useCalendarView } from './hooks/useCalendarView.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
 import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
 import { Event, EventForm, RepeatType } from './types';
-import {
-  formatDate,
-  formatMonth,
-  formatWeek,
-  getEventsForDay,
-  getWeekDates,
-  getWeeksAtMonth,
-} from './utils/dateUtils';
 import { findOverlappingEvents } from './utils/eventOverlap';
 import { getTimeErrorMessage } from './utils/timeValidation';
 
@@ -163,99 +142,6 @@ function App() {
       await saveEvent(eventData);
       resetForm();
     }
-  };
-
-  const renderWeekView = (currentDate: Date, filteredEvents: Event[], notifiedEvents: string[]) => {
-    const weekDates = getWeekDates(currentDate);
-    return (
-      <VStack data-testid="week-view" align="stretch" w="full" spacing={4}>
-        <Heading size="md">{formatWeek(currentDate)}</Heading>
-        <Table variant="simple" w="full">
-          <Thead>
-            <WeekDaysTableColumnHeader />
-          </Thead>
-          <Tbody>
-            <Tr>
-              {weekDates.map((date) => (
-                <Td
-                  key={date.toISOString()}
-                  height="100px"
-                  verticalAlign="top"
-                  width={CALENDAR_TABLE_COLUMN_WIDTH}
-                >
-                  <Text fontWeight="bold">{date.getDate()}</Text>
-                  {filteredEvents
-                    .filter((event) => new Date(event.date).toDateString() === date.toDateString())
-                    .map((event) => {
-                      const isNotified = notifiedEvents.includes(event.id);
-
-                      return <ScheduleDay key={event.id} event={event} isNotified={isNotified} />;
-                    })}
-                </Td>
-              ))}
-            </Tr>
-          </Tbody>
-        </Table>
-      </VStack>
-    );
-  };
-
-  const renderMonthView = (
-    currentDate: Date,
-    holidays: { [key: string]: string },
-    filteredEvents: Event[],
-    notifiedEvents: string[]
-  ) => {
-    const weeks = getWeeksAtMonth(currentDate);
-
-    return (
-      <VStack data-testid="month-view" align="stretch" w="full" spacing={4}>
-        <Heading size="md">{formatMonth(currentDate)}</Heading>
-        <Table variant="simple" w="full">
-          <Thead>
-            <WeekDaysTableColumnHeader />
-          </Thead>
-          <Tbody>
-            {weeks.map((week, weekIndex) => (
-              <Tr key={weekIndex}>
-                {week.map((day, dayIndex) => {
-                  const dateString = day ? formatDate(currentDate, day) : '';
-                  const holiday = holidays[dateString];
-
-                  return (
-                    <Td
-                      key={dayIndex}
-                      height="100px"
-                      verticalAlign="top"
-                      width={CALENDAR_TABLE_COLUMN_WIDTH}
-                      position="relative"
-                    >
-                      {day && (
-                        <>
-                          <Text fontWeight="bold">{day}</Text>
-                          {holiday && (
-                            <Text color="red.500" fontSize="sm">
-                              {holiday}
-                            </Text>
-                          )}
-                          {getEventsForDay(filteredEvents, day).map((event) => {
-                            const isNotified = notifiedEvents.includes(event.id);
-
-                            return (
-                              <ScheduleDay key={event.id} event={event} isNotified={isNotified} />
-                            );
-                          })}
-                        </>
-                      )}
-                    </Td>
-                  );
-                })}
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </VStack>
-    );
   };
 
   return (
@@ -385,34 +271,7 @@ function App() {
           </Button>
         </VStack>
 
-        <VStack flex={1} spacing={5} align="stretch">
-          <Heading>일정 보기</Heading>
-
-          <HStack mx="auto" justifyContent="space-between">
-            <IconButton
-              aria-label="Previous"
-              icon={<ChevronLeftIcon />}
-              onClick={() => navigate('prev')}
-            />
-            <Select
-              aria-label="view"
-              value={view}
-              onChange={(e) => setView(e.target.value as 'week' | 'month')}
-            >
-              <option value="week">Week</option>
-              <option value="month">Month</option>
-            </Select>
-            <IconButton
-              aria-label="Next"
-              icon={<ChevronRightIcon />}
-              onClick={() => navigate('next')}
-            />
-          </HStack>
-
-          {view === 'week' && renderWeekView(currentDate, filteredEvents, notifiedEvents)}
-          {view === 'month' &&
-            renderMonthView(currentDate, holidays, filteredEvents, notifiedEvents)}
-        </VStack>
+        <CalendarView events={events} />
 
         <VStack data-testid="event-list" w="500px" h="full" overflowY="auto">
           <FormControl>
