@@ -23,6 +23,7 @@ import { getTimeErrorMessage } from '../utils/timeValidation';
 type CalendarFormProps = {
   events: Event[];
   editingEvent: Event | null;
+  // eslint-disable-next-line no-unused-vars
   saveEvent: (event: Event | EventForm) => Promise<void>;
 };
 

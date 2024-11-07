@@ -17,7 +17,7 @@ type DialogProps = {
 
 const DIALOG_COMPONENTS = {
   [Dialog_e.ScheduleOverlap]: ScheduleOverlapDialog,
-  [Dialog_e.NewDialog]: (props: any) => <>NewDialog</>, // 신규 다이얼로그 추가시 여기에 추가
+  [Dialog_e.NewDialog]: () => <>NewDialog</>, // 신규 다이얼로그 추가시 여기에 추가
 } as const;
 
 // ! 다이얼로그 컨텍스트
@@ -25,6 +25,7 @@ export interface DialogContextType {
   cancelRef: React.RefObject<HTMLButtonElement>;
   currentDialog: Dialog_t | null;
   dialogProps?: DialogProps[Dialog_t];
+  // eslint-disable-next-line no-unused-vars
   openDialog: <T extends Dialog_t>(dialog: T, dialogProps?: DialogProps[T]) => void;
   closeDialog: () => void;
 }

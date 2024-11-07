@@ -8,7 +8,9 @@ import { ScheduleSearched } from './ScheduleSearched';
 
 type CalendarSearchProps = {
   events: Event[];
+  // eslint-disable-next-line no-unused-vars
   editEvent: (event: Event) => void;
+  // eslint-disable-next-line no-unused-vars
   deleteEvent: (id: string) => void;
 };
 

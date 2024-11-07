@@ -7,7 +7,9 @@ import { Event } from '../types';
 type ScheduleSearchedProps = {
   event: Event;
   isNotified: boolean;
+  // eslint-disable-next-line no-unused-vars
   editEvent: (event: Event) => void;
+  // eslint-disable-next-line no-unused-vars
   deleteEvent: (id: string) => void;
 };
 
