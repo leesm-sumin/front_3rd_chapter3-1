@@ -6,6 +6,7 @@ import { CalendarSearch } from './components/CalendarSearch.tsx';
 import { CalendarView } from './components/CalendarView.tsx';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
+import { CalendarViewHookProvider } from './providers/CalendarViewHookProvider.tsx';
 import { DialogProvider } from './providers/DialogProvider.tsx';
 
 function App() {
@@ -17,17 +18,19 @@ function App() {
 
   return (
     <DialogProvider>
-      <Box w="full" h="100vh" m="auto" p={5}>
-        <Flex gap={6} h="full">
-          <CalendarForm events={events} editingEvent={editingEvent} saveEvent={saveEvent} />
+      <CalendarViewHookProvider>
+        <Box w="full" h="100vh" m="auto" p={5}>
+          <Flex gap={6} h="full">
+            <CalendarForm events={events} editingEvent={editingEvent} saveEvent={saveEvent} />
 
-          <CalendarView events={events} />
+            <CalendarView events={events} />
 
-          <CalendarSearch events={events} editEvent={editEvent} deleteEvent={deleteEvent} />
-        </Flex>
+            <CalendarSearch events={events} editEvent={editEvent} deleteEvent={deleteEvent} />
+          </Flex>
 
-        <CalendarNotification events={events} />
-      </Box>
+          <CalendarNotification events={events} />
+        </Box>
+      </CalendarViewHookProvider>
     </DialogProvider>
   );
 }

@@ -3,12 +3,8 @@ import { IconButton, Select, VStack, HStack, Heading } from '@chakra-ui/react';
 
 import { CalendarMonthView } from './CalendarMonthView';
 import { CalendarWeekView } from './CalendarWeekView';
-import {
-  CalendarDirection_e,
-  CalendarView_e,
-  CalendarView_t,
-  useCalendarView,
-} from '../hooks/useCalendarView';
+import { CalendarDirection_e, CalendarView_e, CalendarView_t } from '../hooks/useCalendarView';
+import { useCalendarViewContext } from '../hooks/useCalendarViewContext';
 import { Event } from '../types';
 
 type CalendarViewProps = {
@@ -16,7 +12,7 @@ type CalendarViewProps = {
 };
 
 export const CalendarView = ({ events }: CalendarViewProps) => {
-  const { view, currentDate, holidays, setView, navigate } = useCalendarView();
+  const { view, currentDate, holidays, setView, navigate } = useCalendarViewContext();
 
   return (
     <VStack flex={1} spacing={5} align="stretch">

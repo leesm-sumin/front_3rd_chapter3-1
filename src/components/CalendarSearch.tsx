@@ -1,10 +1,10 @@
 import { FormControl, FormLabel, Input, VStack, Text } from '@chakra-ui/react';
 
-import { useCalendarView } from '../hooks/useCalendarView';
 import { useNotifications } from '../hooks/useNotifications';
 import { useSearch } from '../hooks/useSearch';
 import { Event } from '../types';
 import { ScheduleSearched } from './ScheduleSearched';
+import { useCalendarViewContext } from '../hooks/useCalendarViewContext';
 
 type CalendarSearchProps = {
   events: Event[];
@@ -16,7 +16,7 @@ type CalendarSearchProps = {
 
 export const CalendarSearch = ({ events, editEvent, deleteEvent }: CalendarSearchProps) => {
   const { notifiedEvents } = useNotifications(events);
-  const { view, currentDate } = useCalendarView();
+  const { view, currentDate } = useCalendarViewContext();
   const { searchTerm, filteredEvents, setSearchTerm } = useSearch(events, currentDate, view);
 
   return (
