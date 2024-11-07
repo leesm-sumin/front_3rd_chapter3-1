@@ -34,7 +34,7 @@ export const CalendarView = ({ events }: CalendarViewProps) => {
           onChange={(e) => setView(e.target.value as CalendarView_t)}
         >
           <option value={CalendarView_e.Week}>Week</option>
-          <option value="month">Month</option>
+          <option value={CalendarView_e.Month}>Month</option>
         </Select>
         <IconButton
           aria-label="Next"
