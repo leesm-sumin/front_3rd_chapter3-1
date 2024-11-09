@@ -72,10 +72,10 @@ describe('CalendarSearch', () => {
     },
   ];
 
-  const editEvent = vi.fn();
-  const deleteEvent = vi.fn();
+  const renderComponent = () => {
+    const editEvent = vi.fn();
+    const deleteEvent = vi.fn();
 
-  it('검색어를 입력하지 않은 상태에서는 해당 뷰의 이벤트를 모두 표시한다.', () => {
     render(
       <ChakraProvider>
         <CalendarViewHookProvider>
@@ -83,6 +83,10 @@ describe('CalendarSearch', () => {
         </CalendarViewHookProvider>
       </ChakraProvider>
     );
+  };
+
+  it('검색어를 입력하지 않은 상태에서는 해당 뷰의 이벤트를 모두 표시한다.', () => {
+    renderComponent();
 
     expect(screen.getByTestId('event-list')).toBeInTheDocument();
 
@@ -93,13 +97,7 @@ describe('CalendarSearch', () => {
   });
 
   it('검색어를 입력하면 해당 이벤트만 표시한다.', () => {
-    render(
-      <ChakraProvider>
-        <CalendarViewHookProvider>
-          <CalendarSearch events={events} editEvent={() => {}} deleteEvent={deleteEvent} />
-        </CalendarViewHookProvider>
-      </ChakraProvider>
-    );
+    renderComponent();
 
     const input = screen.getByPlaceholderText('검색어를 입력하세요');
 
@@ -110,14 +108,7 @@ describe('CalendarSearch', () => {
 
   it('해당 뷰에 검색 결과가 없을 때 검색 결과가 없다는 메시지를 표시한다.', () => {
     vi.setSystemTime('2024-09-01');
-
-    render(
-      <ChakraProvider>
-        <CalendarViewHookProvider>
-          <CalendarSearch events={events} editEvent={() => {}} deleteEvent={deleteEvent} />
-        </CalendarViewHookProvider>
-      </ChakraProvider>
-    );
+    renderComponent();
 
     expect(screen.getByText('검색 결과가 없습니다.')).toBeInTheDocument();
   });
